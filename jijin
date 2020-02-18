@@ -40,14 +40,7 @@ class Index extends Controller
     protected function  calculateResultByInr($total, $riseAndFallList, $condRise = 2) {// 2/10
         $c = self::ZONE;
         $startTotal = $total = bcmul($total, 1,4);
-        $addSub = bcmul($startTotal, 1.1,4);// 增加卖出仓位
-        $add2Sub = bcmul($startTotal, 1.5,4);// 增加卖出仓位
         $stopSub = bcmul($startTotal, 0.25,4);// 停止卖出仓位
-        $moreSub = bcmul($startTotal, 0.78,4);// 增加卖出仓位
-        $lessSub = bcmul($startTotal, 0.9,4);// 减少卖出仓位
-        $add1Fix = bcmul($startTotal, 0.9,4);
-        $add2Fix = bcmul($startTotal, 0.75,4);
-        $add3Fix = bcmul($startTotal, 0.5,4);
         $shortPeriodSub = $highPeriodSub = false;
         $totalLog = $totalAdd = $totalSub = [];
         $totalLogN = [];
@@ -78,30 +71,15 @@ class Index extends Controller
                         $shortPeriodSub = false;
                         $incrMoney = bcmul($incrMoney, 3, 4);
                     }
-                    // 触发熊市短线出仓系数，幅度带优化
-                    if($highPeriodSub && ($this->todayRiseMoreThan($t, 2) || $this->riseMoreThan($accumLog, 5, 5)) ) {
+
+                    // 触发熊市底部出仓系数，幅度带优化
+                    if($highPeriodSub && ($this->todayRiseMoreThan($t, 2.8) || $this->riseMoreThan($accumLog, 5, 5)) ) {
                         $highPeriodSub = false;
                         $incrMoney = bcmul($incrMoney, 0.5, 4);
                     }
-                    // todo 此处改为仓位连续大于
-                    elseif(bccomp($total, $addSub,4) == 1 && bccomp(abs($t),3,2) > 0){
-                        //$incrMoney = bcmul($incrMoney, 1.2, 4);
-                    }
 
-                    if(bccomp($total, $stopSub,4) == 1 && bccomp($incrMoney, 10,4) == 1) {
-
-                        // 该策略会大量增加平均成本，先不用，待调优使用
-                        //减少卖出
-                        if(bccomp($total, $moreSub,4) == 1) {
-                            //$incrMoney = bcmul($incrMoney, 0.9, 4);
-                        }
-//                        // 增加卖出
-//                        elseif(bccomp($total, $moreSub,4) == 1 && bccomp($total, $lessSub,4) == -1) {
-//                            $incrMoney = bcmul($incrMoney, 1.2, 4);
-//                            if(bccomp($total, $incrMoney,4) == -1) {
-//                                $incrMoney = $total;
-//                            }
-//                        }
+                    // 低于1/4仓位停止卖出
+                    if($this->totalMoreThan($total, 0.25)) {
                         if(bccomp($total, $incrMoney,4) == -1) {
                             $incrMoney = $total;
                         }
@@ -112,14 +90,6 @@ class Index extends Controller
                 }
                 // 买入
                 if($sign < 0) {
-                    //谨慎修正，降低成本
-                    if(bccomp($total, $add1Fix,4) == -1 && bccomp(abs($t),1.1,2) > 0) {
-                        //$incrMoney = bcmul($incrMoney, 0.8, 4);// 进仓系数2,注意是否平仓
-                    }
-                    if(bccomp($total, $add2Fix,4) == -1 && bccomp(abs($t),3.5,2) > 0) {
-                        //$incrMoney = bcmul($incrMoney, 0.9, 4);// 进仓系数1.1,注意是否平仓
-                    }
-
                     // 仓位过低 并跌幅大于预定值或者连续两天下跌幅度达到预定值时，增加仓位，幅度带优化
                     if($this->totalLessThan($total, 0.5) && ($this->todayRiseMoreThan($t, 4) || $this->riseLessThan($accum, 2, -5)) ) {
                         $incrMoney = bcmul($incrMoney, 3, 4);// 进仓系数3,注意是否平仓
@@ -133,18 +103,11 @@ class Index extends Controller
                     if ($this->totalMoreThan($total, 1.2) && $this->totalLessThan($total, 1.5) && ($this->riseLessThan($accumLog, 10, -5) && $this->riseLessThan($accumLog, 15, -8))  ) {
                         $accum = [];
                         continue;
-                        //$incrMoney = bcmul($incrMoney, 2, 4);
-                        //$highPeriodSub = true;
-                    }elseif($this->totalMoreThan($total, 1.5) && $this->totalLessThan($total, 2)) {
+                    }
+                    // 熊市底部适当加大买入力度
+                    elseif($this->totalMoreThan($total, 1.5) && $this->totalLessThan($total, 2)) {
                         $incrMoney = bcmul($incrMoney, 1.3, 4);
                         $highPeriodSub = true;
-                    }
-
-                    // todo 1 调整 仓位过高时，增加判断，改为循序渐进式加仓
-                    if(bccomp($total, $addSub,4) == 1 && bccomp(abs($t),3,2) > 0){
-                        //$incrMoney = bcmul($incrMoney, 1.2, 4);
-                    }elseif(bccomp($total, $add2Sub,4) == 1 && bccomp(abs($t),1,2) > 0){
-                        //$incrMoney = bcmul($incrMoney, 2, 4);
                     }
 
                     if(bccomp($incrMoney, 10,4) == 1) {
