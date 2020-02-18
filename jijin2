@@ -1,0 +1,213 @@
+<?php
+namespace Metro\App\Api\Controller\Index;
+use Metro\App\Api\Controller\Controller;
+
+class Index extends Controller
+{
+    private $totalMoney = 4000;
+    private $zone = 200;
+    const P_NUM = 20;// 分片数量
+
+    // 输入数据，计算原始涨幅
+    public function test(){
+        $total = $this->totalMoney;
+        // 上证50 --
+        $data0047462YStr = "0.70%,2.42%,0.56%,0.21%,-1.56%,-1.88%,0.46%,-0.75%,-0.11%,1.00%,-0.62%,1.15%,0.11%,-0.23%,-0.89%,-0.02%,1.13%,-0.92%,1.06%,0.12%,-0.57%,-1.58%,-1.84%,-2.15%,0.11%,-2.40%,1.87%,-0.44%,-0.75%,-0.45%,0.82%,0.12%,2.37%,0.55%,-1.23%,-1.20%,-1.91%,-1.21%,0.57%,1.50%,-1.22%,0.44%,2.52%,-0.18%,-1.54%,-1.59%,0.13%,0.30%,-0.60%,2.21%,1.56%,0.00%,0.87%,-0.44%,1.57%,0.11%,-1.02%,-0.80%,1.51%,-0.25%,-0.35%,-1.83%,-0.81%,0.27%,0.97%,-0.62%,-1.28%,2.74%,-0.77%,2.39%,0.93%,-0.47%,0.10%,-0.95%,0.37%,1.61%,-0.60%,-0.19%,0.24%,-2.02%,0.67%,-0.46%,0.07%,-1.81%,-1.29%,-2.65%,-1.56%,2.78%,,-3.64%,-0.51%,-0.76%,0.31%,1.31%,3.15%,-0.18%,-1.18%,1.90%,0.51%,-0.81%,-0.76%,-0.68%,0.14%,2.22%,0.41%,1.12%,0.43%,-1.29%,-0.12%,-0.18%,0.14%,-2.23%,-1.87%,-1.31%,-0.63%,3.18%,-1.33%,2.90%,0.21%,-0.97%,-0.37%,-2.72%,-0.25%,-1.41%,1.03%,2.53%,-0.01%,0.28%,0.67%,2.73%,-0.58%,-0.34%,-0.98%,-1.02%,-0.23%,1.21%,-2.52%,-1.23%,1.25%,-0.77%,-0.52%,-1.00%,0.92%,0.61%,-0.89%,2.48%,1.44%,-0.12%,3.57%,-1.15%,1.76%,-0.03%,1.05%,-4.57%,0.42%,-0.52%,-3.67%,1.95%,-1.34%,-0.15%,-0.06%,-2.60%,3.66%,3.69%,-3.00%,-0.67%,-0.08%,-0.69%,-4.55%,0.35%,1.99%,0.85%,4.01%,-1.55%,-0.56%,-0.52%,0.22%,-1.71%,0.33%,1.06%,-1.22%,0.91%,0.06%,1.24%,-1.66%,0.68%,-0.46%,-1.42%,0.08%,-0.50%,1.28%,-0.78%,1.30%,2.76%,0.06%,-0.30%,-2.49%,-0.45%,-1.06%,0.58%,0.36%,1.70%,-1.68%,-0.23%,-1.11%,-1.46%,-1.20%,-1.49%,0.49%,-0.30%,-0.84%,-0.39%,1.07%,,-1.52%,-0.22%,2.19%,0.00%,-0.39%,1.51%,0.04%,1.01%,-1.33%,2.88%,0.40%,-0.43%,2.38%,0.83%,-1.39%,-0.08%,0.71%,1.21%,-0.17%,0.86%,-0.85%,1.86%,0.98%,1.62%,0.39%,1.76%,0.24%,-2.37%,2.76%,-0.61%,0.32%,-0.51%,1.34%,5.25%,-1.69%,0.40%,0.46%,2.65%,0.54%,-0.06%,-0.22%,-2.16%,-2.30%,1.53%,-0.18%,0.42%,0.62%,1.37%,3.44%,-1.00%,-0.03%,-0.44%,0.18%,-2.77%,-0.01%,2.22%,0.17%,3.75%,1.73%,-0.50%,0.71%,1.34%,0.47%,1.49%,0.54%,-2.52%,-0.48%,0.18%,3.04%,-0.15%,-0.27%,1.18%,-2.21%,0.41%,0.10%,-1.30%,-1.19%,1.96%,-0.19%,-4.77%,0.60%,-1.44%,-2.49%,3.86%,-1.15%,-0.51%,2.82%,0.34%,-2.21%,-1.12%,1.01%,-0.30%,-1.46%,0.51%,0.56%,1.05%,0.29%,-0.43%,-0.31%,0.49%,-1.13%,-0.44%,-0.43%,1.65%,3.08%,-0.66%,-0.09%,-0.03%,0.12%,0.48%,1.59%,3.40%,-0.46%,0.61%,-1.08%,0.08%,1.23%,0.11%,,2.71%,0.25%,-1.43%,-0.53%,1.17%,-2.09%,-0.31%,0.12%,0.23%,0.99%,-0.22%,-0.85%,-0.23%,-0.48%,1.21%,-0.05%,-0.40%,0.75%,0.81%,0.22%,-0.08%,0.28%,-1.33%,-0.79%,-1.00%,-1.74%,-0.70%,-0.12%,1.44%,-0.58%,2.19%,-1.08%,0.66%,0.29%,0.53%,1.29%,0.05%,-0.51%,0.54%,1.69%,-1.63%,0.62%,-0.35%,-0.39%,0.66%,0.46%,-0.33%,0.64%,0.88%,0.86%,-0.06%,-0.34%,-1.24%,1.31%,-0.52%,-0.93%,1.05%,-0.02%,0.45%,-1.01%,0.52%,-0.17%,-0.02%,0.11%,-0.88%,1.15%,-0.24%,0.88%,1.09%,0.60%,0.21%,-0.27%,0.13%,-1.25%,0.13%,0.01%,-0.84%,0.02%,0.71%,0.47%,0.15%,-0.99%,0.76%,1.89%,0.54%,0.43%,-0.34%,0.05%,-0.43%,-1.57%,0.33%,0.37%,0.12%,-0.45%,0.61%,0.89%,-1.01%,-0.84%,-1.52%,0.55%,0.00%,-0.05%,-0.33%,-1.67%,0.08%,0.40%,0.09%,0.45%,0.71%,-0.54%,0.24%,0.26%,-0.38%,2.09%,-0.48%,0.88%,-0.33%,-0.33%,-0.18%,-0.69%,0.44%,-0.45%,0.79%,0.43%,0.91%,0.34%,1.02%,-0.22%,-1.01%,0.79%,-0.99%,1.08%,0.18%,0.99%,-0.69%,-0.24%,-0.31%,0.27%,0.43%,-1.62%,0.14%,-2.80%,-6.23%,2.83%,0.80%,1.78%,-0.27%,-0.30%,1.19%,0.36%,-0.78%,0.59%,1.20%";
+        $data0047461YStr = "0.24%,-2.37%,2.76%,-0.61%,0.32%,-0.51%,1.34%,5.25%,-1.69%,0.40%,0.46%,2.65%,0.54%,-0.06%,-0.22%,-2.16%,-2.30%,1.53%,-0.18%,0.42%,0.62%,1.37%,3.44%,-1.00%,-0.03%,-0.44%,0.18%,-2.77%,-0.01%,2.22%,0.17%,3.75%,1.73%,-0.50%,0.71%,1.34%,0.47%,1.49%,0.54%,-2.52%,-0.48%,0.18%,3.04%,-0.15%,-0.27%,1.18%,-2.21%,0.41%,0.10%,-1.30%,-1.19%,1.96%,-0.19%,-4.77%,0.60%,-1.44%,-2.49%,3.86%,-1.15%,-0.51%,2.82%,0.34%,-2.21%,-1.12%,1.01%,-0.30%,-1.46%,0.51%,0.56%,1.05%,0.29%,-0.43%,-0.31%,0.49%,-1.13%,-0.44%,-0.43%,1.65%,3.08%,-0.66%,-0.09%,-0.03%,0.12%,0.48%,1.59%,3.40%,-0.46%,0.61%,-1.08%,0.08%,1.23%,0.11%,,2.71%,0.25%,-1.43%,-0.53%,1.17%,-2.09%,-0.31%,0.12%,0.23%,0.99%,-0.22%,-0.85%,-0.23%,-0.48%,1.21%,-0.05%,-0.40%,0.75%,0.81%,0.22%,-0.08%,0.28%,-1.33%,-0.79%,-1.00%,-1.74%,-0.70%,-0.12%,1.44%,-0.58%,2.19%,-1.08%,0.66%,0.29%,0.53%,1.29%,0.05%,-0.51%,0.54%,1.69%,-1.63%,0.62%,-0.35%,-0.39%,0.66%,0.46%,-0.33%,0.64%,0.88%,0.86%,-0.06%,-0.34%,-1.24%,1.31%,-0.52%,-0.93%,1.05%,-0.02%,0.45%,-1.01%,0.52%,-0.17%,-0.02%,0.11%,-0.88%,1.15%,-0.24%,0.88%,1.09%,0.60%,0.21%,-0.27%,0.13%,-1.25%,0.13%,0.01%,-0.84%,0.02%,0.71%,0.47%,0.15%,-0.99%,0.76%,1.89%,0.54%,0.43%,-0.34%,0.05%,-0.43%,-1.57%,0.33%,0.37%,0.12%,-0.45%,0.61%,0.89%,-1.01%,-0.84%,-1.52%,0.55%,0.00%,-0.05%,-0.33%,-1.67%,0.08%,0.40%,0.09%,0.45%,0.71%,-0.54%,0.24%,0.26%,-0.38%,2.09%,-0.48%,0.88%,-0.33%,-0.33%,-0.18%,-0.69%,0.44%,-0.45%,0.79%,0.43%,0.91%,0.34%,1.02%,-0.22%,-1.01%,0.79%,-0.99%,1.08%,0.18%,0.99%,-0.69%,-0.24%,-0.31%,0.27%,0.43%,-1.62%,0.14%,-2.80%,-6.23%,2.83%,0.80%,1.78%,-0.27%,-0.30%,1.19%,0.36%,-0.78%,0.59%,1.20%";
+
+
+        $data = explode(',', $data0047462YStr);
+        foreach ($data as &$d) {
+            $d = trim($d,'%');
+        }
+
+        $ret = $this->calculateResultByInr($total, $data);
+        $this->success($ret);
+    }
+
+    // 原始计算
+    protected function  calculateOriginResult($total, $riseAndFallList) {
+        $startTotal = $total;
+        $totalLog = [];
+        foreach ($riseAndFallList as $t) {
+            $flag = bccomp($t,0,2);
+            if($flag == 0) continue;
+            $total = bcmul($total, bcadd(1,bcdiv($t,100, 4),4),4);
+            $totalLog[] = $total;
+        }
+        return ['total' => $total, 'profit' => bcsub($total, $startTotal, 4), 'max' => max($totalLog), 'min' => min($totalLog), 'avg' => bcdiv(array_sum($totalLog),count($totalLog),4), 'total_log'=>$totalLog];
+    }
+
+    // 增量幅度增减
+    protected function  calculateResultByInr($total, $riseAndFallList, $condRise = 2) {// 2/10
+        //$c = $this->zone;
+        $startTotal = $total = bcmul($total, 1,4);
+        $shortPeriodSub = $highPeriodSub = false;
+        $totalLog = $totalAdd = $totalSub = [];
+        $totalLogN = [];
+        $accum = $accumLog = [];
+        foreach ($riseAndFallList as $t) {
+            $sign = bccomp($t,0,2); // 当天涨跌标志位
+            $totalLog[] = $total;// 记录前1天余额总数
+            if($sign == 0) continue;// 无变化则调整仓位
+
+            // 当天余额
+            $total = bcmul($total, bcadd(1,bcdiv($t,100, 4),4),4);
+
+            $accum[] = $t; // 上一次调整后涨跌幅度变化列表
+            $accumLog[] = $t;//if($this->riseBottomMark($accumLog)) {echo var_dump(array_slice($accumLog,-12));die;}
+            $accumSumRise = $this->getRateOfRise($accum, count($accum));// 上一次调整后总涨跌幅度
+
+            $check = bccomp(abs($t), $condRise,2) > 0 || bccomp(abs($accumSumRise), $condRise,2) > 0;
+            $changeRise = max([abs($t),abs($accumSumRise)]);// 调整幅度，取当天或者累计幅度中较大的一个值
+            $incrMoney = bcmul($this->zone, $changeRise,4);//计算增量金额
+
+            // 达到触发条件，调整仓位
+            if($check) {
+                //卖出
+                if($sign > 0 && bccomp($total,0,4) == 1) {//当天执行操作后剩余仓位大于0才可卖出
+                    // 触发短线出仓系数，幅度带优化
+                    if($shortPeriodSub && ($this->todayRiseMoreThan($t, 4) || $this->riseMoreThan($accum, 4, 5)) ) {
+                        $shortPeriodSub = false;
+                        $incrMoney = bcmul($incrMoney, 3, 4);
+                    }
+
+                    // 触发熊市底部出仓系数，幅度带优化
+                    if($highPeriodSub && ($this->todayRiseMoreThan($t, 2.8) || $this->riseMoreThan($accumLog, 5, 5)) ) {
+                        $highPeriodSub = false;
+                        $incrMoney = bcmul($incrMoney, 0.5, 4);
+                    }
+
+                    // 低于1/4仓位停止卖出
+                    if($this->totalMoreThan($total, 0.25)) {
+                        if(bccomp($total, $incrMoney,4) == -1) {
+                            $incrMoney = $total;
+                        }
+                        $totalSub[] = $incrMoney;
+                        $totalLogN[] =$incrMoney;
+                        $total = bcsub($total, $incrMoney,4);
+                    }
+                }
+                // 买入
+                if($sign < 0) {
+                    // 仓位过低 并跌幅大于预定值或者连续两天下跌幅度达到预定值时，增加仓位，幅度带优化
+                    if($this->totalLessThan($total, 0.5) && ($this->todayRiseMoreThan($t, 4) || $this->riseLessThan($accum, 2, -5)) ) {
+                        $incrMoney = bcmul($incrMoney, 3, 4);// 进仓系数3,注意是否平仓
+                        $shortPeriodSub = true;
+                    }elseif ($this->totalLessThan($total, 0.66) && ($this->todayRiseMoreThan($t, 4) || $this->riseLessThan($accum, 3, -5))){
+                        $incrMoney = bcmul($incrMoney, 1.5, 4);// 进仓系数1.5,注意是否平仓
+                        $shortPeriodSub = true;// 该仓位规则待验证
+                    }
+
+                    // 仓位过高并且持续熊市时停止买入
+                    if ($this->totalMoreThan($total, 1.2) && $this->totalLessThan($total, 1.5) && ($this->riseLessThan($accumLog, 10, -5) && $this->riseLessThan($accumLog, 15, -8))  ) {
+                        $accum = [];
+                        continue;
+                    }
+                    // 熊市底部适当加大买入力度
+                    elseif($this->totalMoreThan($total, 1.5) && $this->totalLessThan($total, 2)) {
+                        $incrMoney = bcmul($incrMoney, 1.3, 4);
+                        $highPeriodSub = true;
+                    }
+
+
+                    if(bccomp($incrMoney, 10,4) == 1) {
+                        $totalAdd[] = $incrMoney;
+                        $totalLogN[] =$incrMoney;
+                        $total = bcadd($total, $incrMoney,4);
+                    }
+                }
+                $accum = [];
+            }elseif($this->riseBottomMark($accumLog)) {
+                //熊市底部标志，梭哈，重新计算分片大小
+                $incrMoney = bcmul($this->zone, 40,4);//计算增量金额
+                $totalAdd[] = $incrMoney;
+                $totalLogN[] =$incrMoney;
+                $total = bcadd($total, $incrMoney,4);
+                $this->totalMoney = $total;
+                $this->zone = bcdiv($total, 20,0);
+            }
+        }
+        $totalLog[] = $total;// 最后一个录入
+        $profit = bcsub(bcadd($total, array_sum($totalSub), 4), bcadd($startTotal, array_sum($totalAdd), 4),4);
+        return ['total' => $total, 'profit'=> $profit, 'max' => max($totalLog), 'min' => min($totalLog), 'avg' => bcdiv(array_sum($totalLog),count($totalLog),4), 'total_log'=>$totalLog];
+    }
+
+    // 获取最近N天的增长率
+    protected function getRateOfRise($riseAndFallList, $dayNum) {
+        if($dayNum > count($riseAndFallList)) $dayNum = count($riseAndFallList);
+        $dayNum = intval($dayNum);
+        $total=$start = 100;
+
+        $arr = array_slice($riseAndFallList, -$dayNum);
+        foreach ($arr as $t) {
+            $sign = bccomp($t,0,2);
+            if($sign == 0) continue;
+            $total = bcmul($total, bcadd(1,bcdiv($t,100, 4),4),2);
+        }
+        $rate = bcsub($total,$start,2);
+        return $rate;
+    }
+
+    // 判断N天涨跌幅小于
+    protected function riseLessThan($riseAndFallList, $dayNum, $percent) {
+        $rate = $this->getRateOfRise($riseAndFallList, $dayNum);
+        return bccomp($percent, $rate, 4) == 1;
+    }
+
+    // 判断N天涨跌幅大于
+    protected function riseMoreThan($riseAndFallList, $dayNum, $percent) {
+        $rate = $this->getRateOfRise($riseAndFallList, $dayNum);
+        return bccomp($percent, $rate, 4) == -1;
+    }
+
+    // 判断仓位小于
+    protected function totalLessThan($total, $ratio) {
+        $than = bcmul($this->totalMoney, $ratio,4);
+        return bccomp($total, $than, 4) == -1;
+    }
+
+    // 判断仓位大于
+    protected function totalMoreThan($total, $ratio) {
+        $than = bcmul($this->totalMoney, $ratio,4);
+        return bccomp($total, $than, 4) == 1;
+    }
+
+    // 当日波动系数大于
+    protected function todayRiseMoreThan($rise, $ratio) {
+        return bccomp(abs($rise),$ratio,2) > 0;
+    }
+
+    // 底部判断模型
+    protected function riseBottomMark($riseAndFallList) {
+        $minDay = 3;
+        $step = 3;
+        $one = $minDay;
+        $two = $one+$step;
+        $three = $two+$step;
+        $four = $three+$step;
+        $rateOne = $this->getRateOfRise($riseAndFallList, $one);
+        $rateTwo = $this->getRateOfRise($riseAndFallList, $two);
+        $rateThree = $this->getRateOfRise($riseAndFallList, $three);
+        $rateFour = $this->getRateOfRise($riseAndFallList, $four);
+        $rate1M = $this->getRateOfRise($riseAndFallList, 20);
+        $rate2M = $this->getRateOfRise($riseAndFallList, 40);
+        if( bccomp($rateOne, 3, 4) == 1
+            && bccomp($rateTwo, 1, 4) == 1
+            && bccomp($rateTwo, 3, 4) == -1
+            && bccomp($rateThree, 0, 4) == 1
+            && bccomp($rateThree, 2, 4) == -1
+            && bccomp($rateFour, -5, 4) == 1
+            && bccomp($rateFour, 0, 4) == -1
+            && bccomp($rate1M, -10, 4) == 1
+            && bccomp($rate1M, 0, 4) == -1
+            && bccomp($rate2M, -15, 4) == 1
+            && bccomp($rate2M, 0, 4) == -1
+        ){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+}
